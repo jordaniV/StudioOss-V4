@@ -10,4 +10,14 @@ export class HomePage {
 
   constructor(public alertCtrl: AlertController) {}
 
+  async info() {
+    const alert = await this.alertCtrl.create({
+      header: 'Desenvolvido por:',
+      subHeader: 'Vinicius Jordani',
+      message: 'Contato: jordani.developer@gmail.com',
+      buttons: ['Ok']
+    });
+    await alert.present();
+  }
+
 }
