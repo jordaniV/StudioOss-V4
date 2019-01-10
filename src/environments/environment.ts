@@ -5,12 +5,12 @@
 export const environment = {
   production: false,
   firebase: {
-    apiKey: 'AIzaSyBOJMWgc7XDYt9ideOtaeMrN85fr3sDdYU',
-    authDomain: 'studiooss-e924e.firebaseapp.com',
-    databaseURL: 'https://studiooss-e924e.firebaseio.com',
-    projectId: 'studiooss-e924e',
-    storageBucket: 'studiooss-e924e.appspot.com',
-    messagingSenderId: '368080389546'
+    apiKey: 'AIzaSyAfuSSx8k3DtMI8WPMrifhFWIlQru_RT_c',
+    authDomain: 'studio-oss-2b290.firebaseapp.com',
+    databaseURL: 'https://studio-oss-2b290.firebaseio.com',
+    projectId: 'studio-oss-2b290',
+    storageBucket: '',
+    messagingSenderId: '309782919381'
   }
 };
 

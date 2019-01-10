@@ -13,10 +13,10 @@ import { Servico } from './../../domains/servico';
 export class ServicoService {
 
   private Collection: AngularFirestoreCollection<Servico>;
-  private servicos: Observable<Servico[]>;
+  public servicos: Observable<Servico[]>; // private
 
-  constructor(db: AngularFirestore) {
-    this.Collection = db.collection<Servico>('servicos');
+  constructor(public db: AngularFirestore) {
+    this.Collection = this.db.collection<Servico>('servicos');
 
     this.servicos = this.Collection.snapshotChanges().pipe(
       map(actions => {
@@ -33,7 +33,7 @@ export class ServicoService {
     return this.servicos;
   }
 
-  getServico(id) {
+  getServico(id: string) {
     return this.Collection.doc<Servico>(id).valueChanges();
   }
 
@@ -45,7 +45,7 @@ export class ServicoService {
     return this.Collection.add(servico);
   }
 
-  remove(id) {
+  remove(id: string): Promise<void> {
     return this.Collection.doc(id).delete();
   }
 }

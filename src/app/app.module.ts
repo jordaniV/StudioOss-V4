@@ -13,18 +13,18 @@ import { environment } from '../environments/environment';
 
 import { AngularFireModule } from 'angularfire2';
 import { AngularFirestoreModule } from 'angularfire2/firestore';
+
 import { ServicoService } from './services/servico/servico.service';
-import { ModalServicoComponent } from './modals/modal-servico/modal-servico.component';
 
 @NgModule({
-  declarations: [AppComponent, ModalServicoComponent],
+  declarations: [AppComponent],
   entryComponents: [],
   imports: [
     BrowserModule,
     IonicModule.forRoot(),
     AppRoutingModule,
     AngularFireModule.initializeApp(environment.firebase),
-    AngularFirestoreModule,
+    AngularFirestoreModule
   ],
   providers: [
     StatusBar,

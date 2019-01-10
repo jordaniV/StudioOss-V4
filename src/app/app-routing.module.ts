@@ -26,9 +26,7 @@ const routes: Routes = [
   { // PARA ACESSAR UM REGISTRO PELO SEU ID, LOADCHILDREN É O MESMO DA PAGINA RAIZ
     path: 'servicos/:id',
     loadChildren: './pages/servicos/servicos.module#ServicosPageModule'
-  },
-  { path: 'servico', loadChildren: './modals/servico/servico.module#ServicoPageModule' },
-  { path: 'modal-servico', loadChildren: './modals/modal-servico/modal-servico.module#ModalServicoPageModule' }
+  }
 ];
 
 @NgModule({

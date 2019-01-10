@@ -1,4 +1,4 @@
-import { AlertController } from '@ionic/angular';
+import { AlertController, ModalController, ToastController, ItemSliding } from '@ionic/angular';
 import { Component, OnInit } from '@angular/core';
 
 import { Servico } from '../../domains/servico';
@@ -7,7 +7,6 @@ import { ServicoService } from '../../services/servico/servico.service';
 import { ActivatedRoute } from '@angular/router';
 import { NavController, LoadingController } from '@ionic/angular';
 
-
 @Component({
   selector: 'app-servicos',
   templateUrl: './servicos.page.html',
@@ -15,98 +14,88 @@ import { NavController, LoadingController } from '@ionic/angular';
 })
 export class ServicosPage implements OnInit {
 
-  servico: Servico; // PEGA O SERVIÇO SELECIONADO PARA ATUALIZAÇÃO
+
+  servico: Servico; // PEGA O SERVIÇO SELECIONADO
   servicos: Servico[]; // ARMAZENA TODOS OS SERVIÇOS SALVOS NO DB PARA LISTAR NA TELA
 
   servicoId = null; // ID DO SERVIÇO SELECIONADO
+
+  private loading: any;
+
 
   constructor(private alertCtrl: AlertController,
     private route: ActivatedRoute,
     private navCtrl: NavController,
     private servicoService: ServicoService,
-    private loadingCtrl: LoadingController) { }
+    private loadingCtrl: LoadingController,
+    private toastCtrl: ToastController) {
+  }
 
   ngOnInit() {
-    // CARREGA OS SERVIÇOS PARA SEREM LISTADOS NA TELA
-    this.servicoService.getAll().subscribe(res => {
+    this.servicoService.getAll().subscribe((res: Servico[]) => {
+      console.log('Carregou serviços...');
       this.servicos = res;
     });
   }
 
-  // CARREGA OS DADOS DO SERVIÇO SELECIONADO PARA ATUALIZAÇÃO
-  async load() {
-    const loading = await this.loadingCtrl.create({
-      message: 'Carregando...'
+  // ADD SERVIÇO NOVO
+  async add() {
+
+    const alert = await this.alertCtrl.create({
+      header: 'Cadastro de Serviço',
+      inputs: [{
+        name: 'nome',
+        placeholder: 'Serviço'
+      }],
+      buttons: [{
+        text: 'Fechar',
+        handler: data => {
+          return;
+        }
+      },
+      {
+        text: 'Salvar',
+        handler: (data: Servico) => {
+          this.presentLoading();
+          this.servicoService
+            .add(data)
+            .then(() => {
+              this.dismissLoading();
+              this.presentToast('Serviço cadastrado com sucesso!');
+              return;
+            })
+            .catch((err) => {
+              this.dismissLoading();
+              this.presentToast(err);
+              return;
+            });
+        }
+      }]
     });
-    await loading.present();
-
-    this.servicoService.getServico(this.servicoId).subscribe(res => {
-      loading.dismiss();
-      this.servico = res;
-    });
-  }
-  // --------------------------------------------------------
-
-  // SALVA NOVO SERVIÇO CADASTRADO
-  async save() {
-    const loading = await this.loadingCtrl.create({
-      message: 'Salvando...'
-    });
-    await loading.present();
-
-    if (this.servicoId) {
-      this.servicoService.update(this.servico, this.servicoId).then(() => {
-        loading.dismiss();
-        this.navCtrl.navigateBack('home');
-      });
-    } else {
-      this.servicoService.add(this.servico).then(() => {
-        loading.dismiss();
-        this.navCtrl.navigateBack('home');
-      });
-    }
-  }
-  // ----------------------------------
-
-  // ATUALIZAÇÃO DE SERVIÇO - CODIGO NAO ESTA CORRETO
-  async update() {
-    this.servicoId = this.route.snapshot.params['id'];
-    if (this.servicoId) {
-      this.load();
-    }
+    alert.present();
   }
   // -------------------------------------
 
-  // REMOVER SERVIÇO - MELHORAR ESTE METODO
-  remove(item) {
-    this.servicoService.remove(item.id);
-  }
-  // ---------------------------------------
-
-  // METODO CHAMADO PELO BOTAO FAB PARA ADICIONAR NOVO SERVIÇO - NAO FUNCIONA CORETAMENTE
-  async addServico() {
-
+  // REMOVER SERVIÇO
+  async remove(id: string, slidingItem: ItemSliding) {
     const alert = await this.alertCtrl.create({
-      header: 'Cadastro Serviços',
-      inputs: [
-        {
-          name: 'nome',
-          type: 'text',
-          placeholder: 'Serviço'
-        }
-      ],
+      header: 'Excluir Serviço',
+      subHeader: 'Deseja excluir permanentemente o serviço?',
       buttons: [
         {
-          text: 'Salvar',
-          role: 'salvar',
+          text: 'Sim',
+          role: 'sim',
           handler: () => {
-            // FUNÇÃO SALVAR SERVIÇO
-            this.save();
+            slidingItem.close(); // FECHA O SLIDING PARA REINICIAR (CORREÇÃO DE BUG NO SLIDING APÓS REMOÇÃO DE ITEM)
+            this.servicoService.remove(id)
+              .then(() => {
+                this.presentToast('Serviço excluído com sucesso!');
+              })
+              .catch((err) => this.presentToast(err));
           }
         },
         {
-          text: 'Sair',
-          role: 'sair',
+          text: 'Não',
           handler: () => {
             return;
           }
@@ -115,6 +104,29 @@ export class ServicosPage implements OnInit {
     });
     await alert.present();
   }
-  // --------------------------------------------------------
+  // ---------------------------------------
 
+  //  INICIA O LOADING
+  private async presentLoading() {
+    this.loading = await this.loadingCtrl.create({
+      message: 'Salvando...'
+    });
+    this.loading.present();
+  }
+  // --------------------------
+
+  // FECHA O LOADING
+  private dismissLoading() {
+    this.loading.dismiss();
+  }
+  // --------------------------
+
+  // INICIA O TOAST
+  async presentToast(message: string) {
+    const toast = await this.toastCtrl.create({
+      message: message,
+      duration: 2000
+    });
+    await toast.present();
+  }
 }

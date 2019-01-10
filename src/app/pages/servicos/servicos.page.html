@@ -23,17 +23,16 @@
       </div>
     </ng-container>
 
-    <ion-item-sliding *ngFor="let item of servicos">
-      <ion-item lines="inset" button [routerLink]="['/servicos', item.id]">
+    <ion-item-sliding *ngFor="let item of servicos" #slidingItem>
+      <ion-item lines="inset" button> <!-- [routerLink]="['/servicos', item.id]" -->
         <ion-label>
           {{ item.nome }}
         </ion-label>
       </ion-item>
 
       <ion-item-options side="end">
-        <ion-item-option (click)="remove(item)" color="secondary">
-          Check
-          <ion-icon name="checkmark" slot="end"></ion-icon>
+        <ion-item-option (click)="remove(item.id, slidingItem)" color="danger">
+          <ion-icon name="trash" slot="end"></ion-icon>
         </ion-item-option>
       </ion-item-options>
     </ion-item-sliding>
@@ -43,7 +42,7 @@
 
   <!-- BOTÃO FAB -->
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-    <ion-fab-button (click)="addServico()">
+    <ion-fab-button (click)="add()">
       <ion-icon name="add"></ion-icon>
     </ion-fab-button>
   </ion-fab>
