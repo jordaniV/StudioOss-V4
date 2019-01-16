@@ -1,6 +1,6 @@
 export interface Servico {
 
-    id?: string; // O ? DEFINE O CAMPO COMO OPCIONAL
+    id: string;
     nome: string;
 
 }

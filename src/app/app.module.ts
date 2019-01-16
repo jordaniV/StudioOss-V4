@@ -8,13 +8,10 @@ import { StatusBar } from '@ionic-native/status-bar/ngx';
 
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
-
 import { environment } from '../environments/environment';
 
 import { AngularFireModule } from 'angularfire2';
 import { AngularFirestoreModule } from 'angularfire2/firestore';
-
-import { ServicoService } from './services/servico/servico.service';
 
 @NgModule({
   declarations: [AppComponent],
@@ -22,14 +19,11 @@ import { ServicoService } from './services/servico/servico.service';
   imports: [
     BrowserModule,
     IonicModule.forRoot(),
-    AppRoutingModule,
-    AngularFireModule.initializeApp(environment.firebase),
-    AngularFirestoreModule
+    AppRoutingModule
   ],
   providers: [
     StatusBar,
     SplashScreen,
-    ServicoService,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }
   ],
   bootstrap: [AppComponent]
