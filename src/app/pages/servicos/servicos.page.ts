@@ -18,6 +18,7 @@ export class ServicosPage implements OnInit {
 
   servico: Servico; // PEGA O SERVIÇO SELECIONADO
   servicos: Servico[]; // ARMAZENA TODOS OS SERVIÇOS SALVOS NO DB PARA LISTAR NA TELA
+  listaServicos: Servico[]; // PEGO A LISTA PARA VERIFICAÇÃO DE DUPLICIDADE
 
   ref = firebase.database().ref('servicos/'); // APONTO PARA MINHA TABELA NO FIREBASE
 
@@ -48,7 +49,7 @@ export class ServicosPage implements OnInit {
       }],
       buttons: [{
         text: 'Fechar',
-        handler: data => {
+        handler: () => {
           return;
         }
       },
@@ -56,7 +57,7 @@ export class ServicosPage implements OnInit {
         text: 'Salvar',
         handler: (data: Servico) => {
           this.ehDuplicado(data.nome);
-          if (!this.duplicado) {
+          if (this.duplicado) {
             this.presentAlert('Este serviço já esta cadastrado.');
           } else {
             const novoServico = firebase.database().ref('servicos/').push();
@@ -88,7 +89,6 @@ export class ServicosPage implements OnInit {
           role: 'sim',
           handler: () => {
             console.log(id);
-            // slidingItem.close(); // FECHA O SLIDING PARA REINICIAR (CORREÇÃO DE BUG NO SLIDING APÓS REMOÇÃO DE ITEM)
             firebase.database()
               .ref('servicos/' + id)
               .remove()
@@ -149,7 +149,30 @@ export class ServicosPage implements OnInit {
   // ------------------------------------------------
 
   // VERIFICA SE EXISTE SERVIÇO
-  ehDuplicado() {
+  ehDuplicado(nome: string) {
+    this.duplicado = false;
+
+    firebase.database()
+      .ref('servicos/')
+      .on('value', res => {
+        this.listaServicos = [];
+        this.listaServicos = this.snapshotToArray(res);
+      });
+
+    console.log('tamanhO listServico: ' + this.listaServicos.length);
+
+    for (let index = 0; index <= this.listaServicos.length - 1; index++) {
+      console.log('Index: ' + index + ' ID: ' + this.listaServicos[index].id + ' Nome: ' + this.listaServicos[index].nome);
+      if (nome === this.listaServicos[index].nome) {
+        this.duplicado = true;
+        console.log('igual: ' + this.duplicado);
+        break;
+      } else {
+        this.duplicado = false;
+        console.log('Diferente: ' + this.duplicado);
+      }
+    }
+
   }
 
   // ------------------------------------------------
