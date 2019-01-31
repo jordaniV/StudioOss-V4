@@ -10,7 +10,7 @@
 <ion-content padding>
 
   <!-- BARRA DE PESQUISA -->
-  <ion-searchbar animated debounce="500"></ion-searchbar>
+  <ion-searchbar animated debounce="500" (ionInput)="search($event)"></ion-searchbar>
 
   <!-- LISTAGEM DOS SERVIÇOS -->
   <ion-list>

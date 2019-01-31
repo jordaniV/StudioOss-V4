@@ -1,9 +1,9 @@
 import { AlertController, ToastController, ItemSliding } from '@ionic/angular';
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
 import { Servico } from '../../domains/servico';
 
-import { NavController, LoadingController } from '@ionic/angular';
+import { LoadingController } from '@ionic/angular';
 
 import * as firebase from 'firebase';
 
@@ -19,6 +19,7 @@ export class ServicosPage implements OnInit {
   servico: Servico; // PEGA O SERVIÇO SELECIONADO
   servicos: Servico[]; // ARMAZENA TODOS OS SERVIÇOS SALVOS NO DB PARA LISTAR NA TELA
   listaServicos: Servico[]; // PEGO A LISTA PARA VERIFICAÇÃO DE DUPLICIDADE
+  loadedServico: Servico[]; // RECEBE O VALOR DE SERVIÇOS PARA A BUSCA NO SEARCHBAR
 
   ref = firebase.database().ref('servicos/'); // APONTO PARA MINHA TABELA NO FIREBASE
 
@@ -35,6 +36,7 @@ export class ServicosPage implements OnInit {
     this.ref.on('value', res => {
       this.servicos = [];
       this.servicos = this.snapshotToArray(res);
+      this.loadedServico = this.servicos;
     });
   }
 
@@ -219,6 +221,23 @@ export class ServicosPage implements OnInit {
       array.push(i);
     });
     return array;
+  }
+
+  search(e) {
+    this.servicos = this.loadedServico;
+    const q = e.srcElement.value;
+    if (!q) {
+      return;
+    }
+    this.servicos = this.servicos.filter((v) => { // DDEPOIS TROCAR LOADEDSERVICO POR SERVICOS
+      if (v.nome && q) {
+        if (v.nome.toLowerCase().indexOf(q.toLowerCase()) > -1) {
+          return true;
+        }
+        return false;
+      }
+    });
+    console.log(q, this.loadedServico.length);
   }
 
 }
