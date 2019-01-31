@@ -1,10 +1,7 @@
-import { AlertController, ToastController, ItemSliding } from '@ionic/angular';
+import { AlertController, ToastController } from '@ionic/angular';
 import { Component, OnInit } from '@angular/core';
-
-import { Servico } from '../../domains/servico';
-
 import { LoadingController } from '@ionic/angular';
-
+import { Servico } from '../../domains/servico';
 import * as firebase from 'firebase';
 
 @Component({
@@ -30,10 +27,10 @@ export class ServicosPage implements OnInit {
     private toastCtrl: ToastController) {
   }
 
-  ngOnInit() {
+  ngOnInit() { // CARREGO OS SERVIÇOS EM UM ARRAY PARA APRESENTAR NA LISTA
     this.ref.on('value', res => {
       this.servicos = [];
-      this.servicos = this.snapshotToArray(res);
+      this.servicos = this.snapshotToArray(res); // CONVERTO O TIPO DE DADO RECEBIDO DO FIREBASE PARA OBJECT
       this.loadedServico = this.servicos;
     });
   }
@@ -56,18 +53,18 @@ export class ServicosPage implements OnInit {
       {
         text: 'Salvar',
         handler: (data: Servico) => {
-          if (data.nome === '') {
+          if (data.nome === '') { // VERIFICA SE CAMPO ESTA PREENCHIDO
             this.presentAlert('Campo serviço não pode ficar em branco!');
           } else {
-            data.nome = data.nome.toUpperCase();
-            this.ehDuplicado(data.nome);
+            data.nome = data.nome.toUpperCase(); // CONVERTE PARA MAIUSCULO
+            this.ehDuplicado(data.nome); // VERIFICA SE É DUPLICADO O CADASTRO
             if (this.duplicado) {
               this.presentAlert('Este serviço já esta cadastrado.');
             } else {
-              const novoServico = firebase.database().ref('servicos/').push();
+              const novoServico = firebase.database().ref('servicos/').push(); // CRIA PUSH PARA SALVAR OS DADOS
               data.id = novoServico.key;
               novoServico
-                .set(data)
+                .set(data) // ARMAZENA OS DADOS
                 .then(() => {
                   this.presentToast('Serviço cadastrado com sucesso!');
                 })
@@ -84,7 +81,7 @@ export class ServicosPage implements OnInit {
   // -------------------------------------
 
   // REMOVER SERVIÇO
-  async remove(id) { // , slidingItem: ItemSliding
+  async remove(id) {
     const alert = await this.alertCtrl.create({
       header: 'Excluir Serviço',
       subHeader: 'Deseja excluir permanentemente o serviço?',
@@ -93,8 +90,7 @@ export class ServicosPage implements OnInit {
           text: 'Sim',
           role: 'sim',
           handler: () => {
-            console.log(id);
-            firebase.database()
+            firebase.database() // METODO PRA REMOÇÃO BASEADO NO ID
               .ref('servicos/' + id)
               .remove()
               .then(() => {
@@ -118,7 +114,7 @@ export class ServicosPage implements OnInit {
   // ---------------------------------------
 
   // UPDATE SERVIÇO
-  async update(id: string, nome: string) { // , slidingItem: ItemSliding
+  async update(id: string, nome: string) {
     const alert = await this.alertCtrl.create({
       header: 'Atualização de Serviço',
       inputs: [{
@@ -135,10 +131,9 @@ export class ServicosPage implements OnInit {
       {
         text: 'Atualizar',
         handler: (data: Servico) => {
-          // this.slidingitem.close(); // FECHA O SLIDING PARA REINICIAR (CORREÇÃO DE BUG NO SLIDING APÓS REMOÇÃO DE ITEM)
-          data.nome = data.nome.toUpperCase();
-          const atualizaServico = firebase.database().ref('servicos/' + id);
-          atualizaServico
+          data.nome = data.nome.toUpperCase(); // COLOCAR O SERVIÇO EM MAIUSCULA
+          const atualizaServico = firebase.database().ref('servicos/' + id); // CRIA VARIAVEL PARA RECEBER A REFERENCIA COM O ID COLETADO
+          atualizaServico // ATUALIZA REGISTRO
             .update(data)
             .then(() => {
               this.presentToast('Serviço atualizado com sucesso!');
@@ -158,45 +153,25 @@ export class ServicosPage implements OnInit {
   ehDuplicado(nome: string) {
     this.duplicado = false;
 
-    firebase.database()
+    firebase.database() // PEGA A REFERENCIA E CONVERTE O RETORNO DO FIREBASE EM OBJECT E ADD NO LISTASERVICO
       .ref('servicos/')
       .on('value', res => {
         this.listaServicos = [];
         this.listaServicos = this.snapshotToArray(res);
       });
 
-    console.log('tamanhO listServico: ' + this.listaServicos.length);
-
-    for (let index = 0; index <= this.listaServicos.length - 1; index++) {
-      console.log('Index: ' + index + ' ID: ' + this.listaServicos[index].id + ' Nome: ' + this.listaServicos[index].nome);
+    for (let index = 0; index <= this.listaServicos.length - 1; index++) { // ITERA ENCIMA DO LISTASERVIÇO E VERIFICA SE EXISTE SERVIÇO
       if (nome === this.listaServicos[index].nome) {
         this.duplicado = true;
-        console.log('igual: ' + this.duplicado);
         break;
       } else {
         this.duplicado = false;
-        console.log('Diferente: ' + this.duplicado);
       }
     }
 
   }
 
   // ------------------------------------------------
-
-  //  INICIA O LOADING
-  private async presentLoading(message: string) {
-    this.loading = await this.loadingCtrl.create({
-      message: message
-    });
-    this.loading.present();
-  }
-  // --------------------------
-
-  // FECHA O LOADING
-  private dismissLoading() {
-    this.loading.dismiss();
-  }
-  // --------------------------
 
   // INICIA O TOAST
   private async presentToast(message: string) {
@@ -207,6 +182,7 @@ export class ServicosPage implements OnInit {
     await toast.present();
   }
 
+  // INICIA ALERT
   private async presentAlert(message: string) {
     const presentAlert = await this.alertCtrl.create({
       header: 'Aviso',
@@ -227,13 +203,14 @@ export class ServicosPage implements OnInit {
     return array;
   }
 
+  // IMPLEMENTAR O METODO DE IONINPUT DO SEARCHBAR
   search(e) {
     this.servicos = this.loadedServico;
     const q = e.srcElement.value;
     if (!q) {
       return;
     }
-    this.servicos = this.servicos.filter((v) => { // DDEPOIS TROCAR LOADEDSERVICO POR SERVICOS
+    this.servicos = this.servicos.filter((v) => {
       if (v.nome && q) {
         if (v.nome.toLowerCase().indexOf(q.toLowerCase()) > -1) {
           return true;
