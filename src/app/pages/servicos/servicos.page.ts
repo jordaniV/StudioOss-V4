@@ -14,8 +14,6 @@ import * as firebase from 'firebase';
 })
 export class ServicosPage implements OnInit {
 
-  // @ViewChild('slidingItem') slidingitem: ItemSliding;
-
   servico: Servico; // PEGA O SERVIÇO SELECIONADO
   servicos: Servico[]; // ARMAZENA TODOS OS SERVIÇOS SALVOS NO DB PARA LISTAR NA TELA
   listaServicos: Servico[]; // PEGO A LISTA PARA VERIFICAÇÃO DE DUPLICIDADE
@@ -58,20 +56,25 @@ export class ServicosPage implements OnInit {
       {
         text: 'Salvar',
         handler: (data: Servico) => {
-          this.ehDuplicado(data.nome);
-          if (this.duplicado) {
-            this.presentAlert('Este serviço já esta cadastrado.');
+          if (data.nome === '') {
+            this.presentAlert('Campo serviço não pode ficar em branco!');
           } else {
-            const novoServico = firebase.database().ref('servicos/').push();
-            data.id = novoServico.key;
-            novoServico
-              .set(data)
-              .then(() => {
-                this.presentToast('Serviço cadastrado com sucesso!');
-              })
-              .catch((err) => {
-                this.presentToast('Erro!: ' + err);
-              });
+            data.nome = data.nome.toUpperCase();
+            this.ehDuplicado(data.nome);
+            if (this.duplicado) {
+              this.presentAlert('Este serviço já esta cadastrado.');
+            } else {
+              const novoServico = firebase.database().ref('servicos/').push();
+              data.id = novoServico.key;
+              novoServico
+                .set(data)
+                .then(() => {
+                  this.presentToast('Serviço cadastrado com sucesso!');
+                })
+                .catch((err) => {
+                  this.presentToast('Erro!: ' + err);
+                });
+            }
           }
         }
       }]
@@ -133,6 +136,7 @@ export class ServicosPage implements OnInit {
         text: 'Atualizar',
         handler: (data: Servico) => {
           // this.slidingitem.close(); // FECHA O SLIDING PARA REINICIAR (CORREÇÃO DE BUG NO SLIDING APÓS REMOÇÃO DE ITEM)
+          data.nome = data.nome.toUpperCase();
           const atualizaServico = firebase.database().ref('servicos/' + id);
           atualizaServico
             .update(data)
@@ -237,7 +241,6 @@ export class ServicosPage implements OnInit {
         return false;
       }
     });
-    console.log(q, this.loadedServico.length);
   }
 
 }
