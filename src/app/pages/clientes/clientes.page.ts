@@ -2,6 +2,7 @@ import { AlertController, ToastController } from '@ionic/angular';
 import { Component, OnInit } from '@angular/core';
 import { Cliente } from 'src/app/domains/cliente';
 import * as firebase from 'firebase';
+import { CallNumber } from '@ionic-native/call-number/ngx';
 
 @Component({
   selector: 'app-clientes',
@@ -20,7 +21,8 @@ export class ClientesPage implements OnInit {
   duplicado = false;
 
   constructor(private alertCtrl: AlertController,
-    private toastCtrl: ToastController) { }
+              private toastCtrl: ToastController,
+              private callNumber: CallNumber) { }
 
   ngOnInit() { // CARREGA OS SERVIÇOS EM UM ARRAY PARA APRESENTAR NA TELA
     this.ref.on('value', res => {
@@ -222,13 +224,16 @@ export class ClientesPage implements OnInit {
         text: 'Sim',
         handler: data => {
           console.log('Ligar');
+          this.callNumber.callNumber('65996357918', true)
+            .then(res => this.presentToast('Funcionou'))
+            .catch(err => this.presentToast(err));
         }
       }]
     });
     await alert.present();
   }
 
-  whats(cliente) {}
+  whats(cliente) { }
 
   // INICIA O TOAST
   private async presentToast(message: string) {
