@@ -18,14 +18,11 @@ export class ServicosPage implements OnInit {
 
   ref = firebase.database().ref('servicos/'); // APONTO PARA MINHA TABELA NO FIREBASE
 
-  public loading;
   duplicado = false;
 
 
   constructor(private alertCtrl: AlertController,
-    private loadingCtrl: LoadingController,
-    private toastCtrl: ToastController) {
-  }
+              private toastCtrl: ToastController) { }
 
   ngOnInit() { // CARREGO OS SERVIÇOS EM UM ARRAY PARA APRESENTAR NA LISTA
     this.ref.on('value', res => {

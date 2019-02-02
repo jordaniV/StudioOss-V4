@@ -1,5 +1,7 @@
 {
   "name": "studiooss-v4",
-  "integrations": {},
+  "integrations": {
+    "cordova": {}
+  },
   "type": "angular"
 }

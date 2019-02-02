@@ -3,10 +3,58 @@
     <ion-buttons slot="start" *ngIf="!isAndroid">
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
-    <ion-title>clientes</ion-title>
+    <ion-title>Clientes</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content padding>
+
+  <!-- BARRA DE PESQUISA -->
+  <ion-searchbar animated debounce="500" (ionInput)="search($event)"></ion-searchbar>
+
+  <!-- LISTAGEM DOS SERVIÇOS -->
+  <ion-list>
+    <ng-container *ngIf="!clientes || clientes.length == 0">
+      <div *ngFor="let n of [0,1,2]" padding>
+        <ion-skeleton-text></ion-skeleton-text>
+        <p>
+          <ion-skeleton-text class="fake-skeleton"></ion-skeleton-text>
+        </p>
+      </div>
+    </ng-container>
+
+    <ion-card *ngFor="let cliente of clientes">
+      <ion-card-content>
+
+        <h2>{{ cliente.nome }}</h2>
+        <h3>{{ cliente.telefone }}</h3>
+        <h3>{{ cliente.obs }}</h3>
+
+        <ion-button fill="clear" size="small" (click)="call(cliente)">
+          <ion-icon slot="icon-only" name="call" color="success"></ion-icon>
+        </ion-button>
+        
+        <ion-button fill="clear" size="small" (click)="whats(cliente)">
+          <ion-icon slot="icon-only" name="logo-whatsapp" color="success"></ion-icon>
+        </ion-button>
+
+        <ion-button fill="clear" size="small" (click)="update(cliente)">
+          <ion-icon slot="icon-only" name="refresh" color="secondary"></ion-icon>
+        </ion-button>
+
+        <ion-button fill="clear" size="small" (click)="remove(cliente.id)">
+          <ion-icon slot="icon-only" name="trash" color="danger"></ion-icon>
+        </ion-button>
+
+      </ion-card-content>
+    </ion-card>
+  </ion-list>
+
+  <!-- BOTÃO FAB -->
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button color="secondary" (click)="add()">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
 
 </ion-content>
